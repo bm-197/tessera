@@ -44,8 +44,10 @@ your secrets.
 Requires Go 1.26+.
 
 ```sh
-go install github.com/bm-197/tessera/cmd/tessera@latest
+go install github.com/bm-197/tessera@latest
 ```
+
+This installs a single `tessera` binary (CLI + TUI) to `$(go env GOPATH)/bin`.
 
 ## Quick start (CLI)
 
@@ -74,7 +76,42 @@ tessera rm <id>
 ```
 
 The passphrase is read from `$TESSERA_PASSPHRASE` if set, otherwise prompted.
-Use `--profile NAME` to keep separate vaults (e.g. for different users).
+
+## Terminal UI
+
+For day-to-day use there's a full-screen interactive UI:
+
+```sh
+tessera tui
+```
+
+It unlocks with your passphrase, then shows your accounts with live codes and a
+countdown bar. Keys:
+
+- `↑/↓` move · `enter` open an account's details
+- `a` add an account (paste an `otpauth://` URI or a raw secret; name required,
+  label optional)
+- `d` delete (with a confirmation)
+- on the detail screen: `e` edit the name/label, `r` add or edit recovery codes
+- `s` sync · `q` quit
+
+A `🔑n` badge next to an account shows it has `n` recovery codes stored.
+
+## Profiles (multiple vaults)
+
+Each profile is a separate, independently-encrypted vault — useful for keeping
+work and personal accounts apart, or hosting a friend's vault on your machine.
+Pass `--profile NAME` (or `-p NAME`) to any command; omit it for the `default`
+profile.
+
+```sh
+tessera -p work init        # create a separate "work" vault (its own passphrase)
+tessera -p work tui         # open it
+tessera -p work add "otpauth://..."
+```
+
+Profiles are fully isolated — different passphrase, vault file, and sync target.
+(Create a new vault with `init` from the CLI; the TUI only opens existing ones.)
 
 ## Sync
 
@@ -96,23 +133,25 @@ The core is a single Go module — the shared brain used by every client.
 
 ```
 core/
-  otp/     TOTP/HOTP generation, otpauth:// + QR URI parsing
+  otp/     TOTP/HOTP generation, otpauth:// URI parsing
   crypto/  Argon2id KDF, AES-256-GCM seal/open, constant-time compare
   vault/   entry model, tombstones, three-way merge
   sync/    backend interface + adapters (filesystem today)
   api/     one clean API used by every client
-cmd/tessera/   the CLI
+tui/       Bubble Tea terminal UI (a client over core/api)
+main.go    the CLI entry point
 ```
 
-**Golden rule:** crypto and vault logic live only in Go. The desktop (Electron)
-and mobile (React Native) clients are UI only — they talk to the same Go core
-and always delegate secret handling to it.
+**Golden rule:** crypto and vault logic live only in Go. Every client — the CLI,
+the TUI, and the planned desktop (Electron) and mobile (React Native) apps — is
+UI only; they talk to the same Go core and always delegate secret handling to it.
 
 ## Status
 
 | Phase | Scope | State |
 |---|---|---|
 | 1 | Core (OTP, crypto, mergeable vault) + filesystem sync + CLI | ✅ Done |
+| 1+ | Interactive terminal UI (Bubble Tea) | ✅ Done |
 | 2 | Google Drive + self-host server backends | Planned |
 | 3 | Desktop (Electron) — QR scan, edit recovery codes, unlock UI | Planned |
 | 4 | Mobile (React Native) — camera QR + same UI | Planned |
