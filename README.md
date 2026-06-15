@@ -86,7 +86,15 @@ tessera tui
 ```
 
 It unlocks with your passphrase, then shows your accounts with live codes and a
-countdown bar. Keys:
+countdown bar.
+
+![Tessera TUI — account list with live codes](docs/tui-list.png)
+
+Press `enter` on an account to see its details and stored recovery codes:
+
+![Tessera TUI — account detail](docs/tui-detail.png)
+
+Keys:
 
 - `↑/↓` move · `enter` open an account's details
 - `a` add an account (paste an `otpauth://` URI or a raw secret; name required,
