@@ -44,7 +44,7 @@ your secrets.
 Requires Go 1.26+.
 
 ```sh
-go install github.com/bm-197/tessera@latest
+go install github.com/bm-197/tessera/cmd/tessera@latest
 ```
 
 This installs a single `tessera` binary (CLI + TUI) to `$(go env GOPATH)/bin`.
@@ -146,9 +146,13 @@ core/
   vault/   entry model, tombstones, three-way merge
   sync/    backend interface + adapters (filesystem today)
   api/     one clean API used by every client
-tui/       Bubble Tea terminal UI (a client over core/api)
-main.go    the CLI entry point
+tui/           Bubble Tea terminal UI (a client over core/api)
+cmd/tessera/   the CLI entry point
 ```
+
+Future binaries get their own `cmd/` directories (e.g. `cmd/tessera-server` for
+the self-host sync server). Mobile reuses `core/` via `gomobile bind` — no extra
+binary.
 
 **Golden rule:** crypto and vault logic live only in Go. Every client — the CLI,
 the TUI, and the planned desktop (Electron) and mobile (React Native) apps — is
