@@ -129,6 +129,16 @@ func (s *Session) RecoveryCodes(id string) ([]string, error) {
 	return e.RecoveryCodes, nil
 }
 
+// SetName updates an account's issuer/label and persists.
+func (s *Session) SetName(id, issuer, label string) error {
+	e := s.vault.Get(id)
+	if e == nil || e.Deleted {
+		return fmt.Errorf("api: no account %q", id)
+	}
+	e.SetLabel(issuer, label, s.now())
+	return s.save()
+}
+
 func (s *Session) Delete(id string) error {
 	e := s.vault.Get(id)
 	if e == nil || e.Deleted {
@@ -180,6 +190,27 @@ func (s *Session) Codes() ([]LiveCode, error) {
 		}
 	}
 	return out, nil
+}
+
+// RenderCodes returns current codes for display only: it has no side effects
+// and does not advance HOTP counters, so it is safe to call repeatedly (e.g.
+// once a second from a TUI).
+func (s *Session) RenderCodes() []LiveCode {
+	now := s.now()
+	entries := s.vault.Live()
+	out := make([]LiveCode, 0, len(entries))
+	for _, e := range entries {
+		lc := LiveCode{Entry: e}
+		code, err := otp.Generate(e.Params, e.Secret, now)
+		if err != nil {
+			lc.Err = err
+		} else {
+			lc.Code = code.Value
+			lc.ExpiresIn = code.ExpiresIn
+		}
+		out = append(out, lc)
+	}
+	return out
 }
 
 func (s *Session) Sync(ctx context.Context, backend sync.Backend, passphrase []byte) error {

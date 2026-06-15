@@ -14,6 +14,7 @@ import (
 	"github.com/bm-197/tessera/core/otp"
 	"github.com/bm-197/tessera/core/sync"
 	"github.com/bm-197/tessera/core/vault"
+	"github.com/bm-197/tessera/tui"
 	"golang.org/x/term"
 )
 
@@ -32,9 +33,10 @@ Commands:
   recovery get <id>             Show stored recovery codes
   rm <id>                       Delete (tombstone) an account
   sync [--path FILE]            Merge with a filesystem backend (no-loss merge)
+  tui                           Open the interactive terminal UI
 
 Global flags:
-  --profile NAME   Vault profile / user (default "default")
+  --profile, -p NAME   Vault profile / user (default "default")
 
 Passphrase is read from $TESSERA_PASSPHRASE if set, otherwise prompted.
 `
@@ -52,11 +54,13 @@ func run(args []string) error {
 	var rest []string
 	for i := 0; i < len(args); i++ {
 		switch {
-		case args[i] == "--profile" && i+1 < len(args):
+		case (args[i] == "--profile" || args[i] == "-p") && i+1 < len(args):
 			profile = args[i+1]
 			i++
 		case strings.HasPrefix(args[i], "--profile="):
 			profile = strings.TrimPrefix(args[i], "--profile=")
+		case strings.HasPrefix(args[i], "-p="):
+			profile = strings.TrimPrefix(args[i], "-p=")
 		default:
 			rest = append(rest, args[i])
 		}
@@ -86,6 +90,8 @@ func run(args []string) error {
 		return cmdRemove(profile, cmdArgs)
 	case "sync":
 		return cmdSync(profile, cmdArgs)
+	case "tui", "ui":
+		return cmdTUI(profile)
 	default:
 		return fmt.Errorf("unknown command %q (try `tessera help`)", cmd)
 	}
@@ -420,6 +426,30 @@ func cmdSync(profile string, args []string) error {
 	}
 	fmt.Printf("Synced with %s\n", syncPath)
 	return nil
+}
+
+func cmdTUI(profile string) error {
+	path, err := vaultPath(profile)
+	if err != nil {
+		return err
+	}
+	if _, err := os.Stat(path); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("no vault for profile %q — run `tessera init` first", profile)
+		}
+		return err
+	}
+	cfg, _ := loadConfig(profile)
+	var pass []byte
+	if env := os.Getenv("TESSERA_PASSPHRASE"); env != "" {
+		pass = []byte(env)
+	}
+	return tui.Run(tui.Options{
+		VaultPath:  path,
+		SyncPath:   cfg.SyncPath,
+		Profile:    profile,
+		Passphrase: pass,
+	})
 }
 
 func displayName(e *vault.Entry) string {
