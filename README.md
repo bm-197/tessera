@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/icon.png" alt="Tessera" width="96" />
+</p>
+
 # Tessera
 
 An end-to-end encrypted 2FA authenticator that **never loses an account on sync**
