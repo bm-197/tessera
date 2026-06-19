@@ -1,0 +1,47 @@
+name: release
+
+# Push a tag like v0.2.0 to build installers on macOS, Windows, and Linux and
+# publish them to a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - run: npm ci
+
+      # Build the Go sidecar for this runner's OS/arch (Windows adds .exe).
+      - run: npm run sidecar
+
+      # Bundle the renderer.
+      - run: npm run build
+
+      # Build the installer and upload it to the GitHub Release for this tag.
+      - run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # No code-signing certs configured yet: build unsigned rather than
+          # failing while searching for an identity. (See docs/RELEASING note.)
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"

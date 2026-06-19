@@ -2,6 +2,8 @@
   "name": "tessera-desktop",
   "private": true,
   "version": "0.1.0",
+  "description": "End-to-end encrypted 2FA authenticator",
+  "author": "bm-197",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {

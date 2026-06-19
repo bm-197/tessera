@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import CommandBox from "../components/CommandBox";
+import Download from "../components/Download";
 import Terminal from "../components/Terminal";
 
 export default function Home() {
@@ -25,6 +26,8 @@ export default function Home() {
           <span className="chip">no account loss</span>
         </div>
       </header>
+
+      <Download />
 
       <section>
         <h2>The terminal UI</h2>

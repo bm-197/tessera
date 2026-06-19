@@ -2,18 +2,45 @@ appId: dev.tessera.app
 productName: Tessera
 directories:
   output: release
+  buildResources: build
 files:
   - dist/**
   - electron/**/*.cjs
-# Bundle the Go sidecar next to the app. NOTE: build the sidecar for each target
-# platform/arch before packaging (the dev build here is host-only).
+# Bundle the Go sidecar. Each CI runner builds it for its own OS/arch into
+# electron/bin (Windows produces tessera-sidecar.exe automatically), and the
+# whole dir is copied to resources/bin.
 extraResources:
-  - from: electron/bin/tessera-sidecar
-    to: bin/tessera-sidecar
+  - from: electron/bin
+    to: bin
+
 mac:
-  target: dmg
+  target:
+    - target: dmg
+      arch: [arm64]
   category: public.app-category.utilities
+  icon: build/icon.icns
+  artifactName: Tessera-mac-${arch}.${ext}
+
 win:
-  target: nsis
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.png # electron-builder generates the .ico from this
+  artifactName: Tessera-win-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
 linux:
-  target: AppImage
+  target:
+    - target: AppImage
+      arch: [x64]
+  icon: build/icon.png
+  category: Utility
+  artifactName: Tessera-linux-${arch}.${ext}
+
+publish:
+  provider: github
+  owner: bm-197
+  repo: tessera

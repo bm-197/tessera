@@ -1,14 +1,17 @@
-const { app, BrowserWindow, ipcMain, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog, nativeImage } = require("electron");
 const path = require("path");
 const { SidecarClient } = require("./rpc.cjs");
+
+app.setName("Tessera");
 
 let win = null;
 let client = null;
 
 function sidecarPath() {
+  const bin = process.platform === "win32" ? "tessera-sidecar.exe" : "tessera-sidecar";
   return app.isPackaged
-    ? path.join(process.resourcesPath, "bin", "tessera-sidecar")
-    : path.join(__dirname, "bin", "tessera-sidecar");
+    ? path.join(process.resourcesPath, "bin", bin)
+    : path.join(__dirname, "bin", bin);
 }
 
 function vaultPath() {
@@ -60,6 +63,14 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Dev only: packaged builds get their icon from the bundle. This makes the
+  // dock/app-switcher show the Tessera icon during `npm run dev` too.
+  if (!app.isPackaged && process.platform === "darwin" && app.dock) {
+    try {
+      app.dock.setIcon(nativeImage.createFromPath(path.join(__dirname, "..", "build", "icon.png")));
+    } catch {}
+  }
+
   client = new SidecarClient(sidecarPath());
 
   ipcMain.handle("tessera:call", async (_e, payload) => {
