@@ -44,3 +44,4 @@ publish:
   provider: github
   owner: bm-197
   repo: tessera
+  releaseType: release # publish the release directly (not a draft)

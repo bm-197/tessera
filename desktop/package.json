@@ -1,7 +1,7 @@
 {
   "name": "tessera-desktop",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "End-to-end encrypted 2FA authenticator",
   "author": "bm-197",
   "type": "module",
