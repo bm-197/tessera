@@ -1,0 +1,19 @@
+appId: dev.tessera.app
+productName: Tessera
+directories:
+  output: release
+files:
+  - dist/**
+  - electron/**/*.cjs
+# Bundle the Go sidecar next to the app. NOTE: build the sidecar for each target
+# platform/arch before packaging (the dev build here is host-only).
+extraResources:
+  - from: electron/bin/tessera-sidecar
+    to: bin/tessera-sidecar
+mac:
+  target: dmg
+  category: public.app-category.utilities
+win:
+  target: nsis
+linux:
+  target: AppImage
