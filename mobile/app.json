@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Tessera",
+    "slug": "tessera",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "tessera",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#1b1e24",
+    "ios": {
+      "bundleIdentifier": "dev.tessera.app",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "dev.tessera.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#eef0f5",
+        "foregroundImage": "./assets/icon.png"
+      },
+      "predictiveBackGestureEnabled": false
+    }
+  }
+}

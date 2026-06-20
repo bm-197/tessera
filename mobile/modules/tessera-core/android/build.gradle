@@ -1,0 +1,33 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+group = 'expo.modules.tesseracore'
+version = '1.0.0'
+
+def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
+apply from: expoModulesCorePlugin
+applyKotlinExpoModulesCorePlugin()
+useCoreDependencies()
+useExpoPublishing()
+
+android {
+  namespace "expo.modules.tesseracore"
+  compileSdkVersion safeExtGet("compileSdkVersion", 36)
+  defaultConfig {
+    minSdkVersion safeExtGet("minSdkVersion", 24)
+  }
+}
+
+repositories {
+  flatDir {
+    dirs "libs"
+  }
+}
+
+dependencies {
+  // The gomobile output. Build it with:
+  //   gomobile bind -target=android -androidapi 24 \
+  //     -o mobile/modules/tessera-core/android/libs/tessera.aar \
+  //     github.com/bm-197/tessera/core/mobile
+  implementation(name: 'tessera', ext: 'aar')
+}

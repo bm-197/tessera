@@ -1,0 +1,26 @@
+{
+  "name": "mobile",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "expo": "~56.0.12",
+    "expo-clipboard": "~56.0.4",
+    "expo-status-bar": "~56.0.4",
+    "react": "19.2.3",
+    "react-native": "0.85.3"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
+    "build:ios-core": "cd .. && gomobile bind -target=ios -o mobile/modules/tessera-core/ios/TesseraGo.xcframework github.com/bm-197/tessera/core/mobile",
+    "build:android-core": "cd .. && gomobile bind -target=android -androidapi 24 -o mobile/modules/tessera-core/android/libs/tessera.aar github.com/bm-197/tessera/core/mobile",
+    "build:native": "npm run build:ios-core && npm run build:android-core"
+  },
+  "private": true
+}

@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["TesseraCoreModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.tesseracore.TesseraCoreModule"]
+  }
+}

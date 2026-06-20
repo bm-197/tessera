@@ -8,7 +8,7 @@ type OS = "mac" | "win" | "linux";
 const DOWNLOADS: Record<OS, { label: string; file: string; note: string }> = {
   mac: { label: "Download for macOS", file: "Tessera-mac-arm64.dmg", note: "Apple Silicon · .dmg" },
   win: { label: "Download for Windows", file: "Tessera-win-x64.exe", note: "64-bit · .exe" },
-  linux: { label: "Download for Linux", file: "Tessera-linux-x64.AppImage", note: "64-bit · AppImage" },
+  linux: { label: "Download for Linux", file: "Tessera-linux-x86_64.AppImage", note: "64-bit · AppImage" },
 };
 
 function detectOS(): OS {
